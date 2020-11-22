@@ -1,61 +1,48 @@
-import { firstLastDiff, runningPercentageDiff } from './Utilities';
+/* eslint-disable max-len */
+// For some reason prettier keeps pushing the line past 100, despite the eslint rules
+// saying not to go over 100. Not sure what's happening here so I'll just disable the
+// rule in this file for now
+
+import {
+  startVsEndDiffFilter,
+  increasingForLastNumPointsFilter,
+  increasingForAllPointsFilter,
+} from './Filters';
+
+import { SUPPORTED_STRATEGIES } from '../constants';
 
 /**
- * Filter to find companies where an attribute is above a
- * certain threshold for the first and last year
+ * Creates a group of filters to get only companies that match the user's requirements
  *
- * @param {Array.<module:app.Fundamentals>} array Array of fundamentals
- * @param {string} attribute The attribute we want to filter on
- * @param {number} threshold The threshold we want to enforce on the fundamentals metric
- * @returns {Array.<module:app.Fundamentals>} The remaining fundamentals that fit this filter
+ * @param {Array.<object>} interactionResults The answers from the user
+ * @returns {Array.<Function>} An array of functions to filter the initial list on
  */
-function startVsEndDiffFilter(array, attribute, threshold) {
-  return array.filter((item) => firstLastDiff(item[attribute]) >= threshold);
+function createFilterGroup(interactionResults) {
+  return interactionResults.map((answer) => createFilter(answer));
 }
 
 /**
- * Filter to find companies where an attribute is above a
- * certain threshold for the last X years running
+ * This method creates individual filters from the user's answers
  *
- * @param {Array.<module:app.Fundamentals>} array Array of fundamentals
- * @param {string} attribute The attribute we want to filter on
- * @param {number} threshold The threshold we want to enforce on the fundamentals metric
- * @param {number} pointsNeeded The number of years of data needed
- * @returns {Array.<module:app.Fundamentals>} The remaining fundamentals that fit this filter
+ * @param {object} answer An answer from the user around what type of screening they want
+ * @returns {Function} A method to filter the fundamentals based on the user's response
  */
-function increasingForLastNumPointsFilter(array, attribute, threshold, pointsNeeded) {
-  return array.filter((stockFundamentals) => {
-    // get the differences in each year
-    const runningDifferences = runningPercentageDiff(stockFundamentals[attribute]);
-
-    // reduce this array by the number of years I care about
-    const reducedRunningDifferences = runningDifferences.slice(pointsNeeded * -1);
-
-    // if there are fewer years than I've specified, remove the item
-    if (reducedRunningDifferences.length !== pointsNeeded) return 0;
-
-    // if every year is above threshold, keep it in the group
-    return reducedRunningDifferences.every((x) => x >= threshold);
-  });
+function createFilter(answer) {
+  switch (answer.type) {
+    case SUPPORTED_STRATEGIES.FIRST_LAST_COMPARISON:
+      return (fundamentals) => startVsEndDiffFilter(fundamentals, answer.attribute, answer.threshold);
+    case SUPPORTED_STRATEGIES.LAST_X_YEARS_COMPARISON:
+      return (fundamentals) => increasingForLastNumPointsFilter(
+        fundamentals,
+        answer.attribute,
+        answer.threshold,
+        answer.years,
+      );
+    case SUPPORTED_STRATEGIES.ALL_YEARS_COMPARISON:
+      return (fundamentals) => increasingForAllPointsFilter(fundamentals, answer.attribute, answer.threshold);
+    default:
+      return undefined;
+  }
 }
 
-/**
- * Filter to find companies where an attribute is above a
- * certain threshold for every year
- *
- * @param {Array.<module:app.Fundamentals>} array Array of fundamentals
- * @param {string} attribute The attribute we want to filter on
- * @param {number} threshold The threshold we want to enforce on the fundamentals metric
- * @returns {Array.<module:app.Fundamentals>} The remaining fundamentals that fit this filter
- */
-function increasingForAllPointsFilter(array, attribute, threshold) {
-  return array.filter((stockFundamentals) => {
-    // get the differences in each year
-    const runningDifferences = runningPercentageDiff(stockFundamentals[attribute]);
-
-    // if every year is above threshold, keep it in the group
-    return runningDifferences.every((x) => x >= threshold);
-  });
-}
-
-export { startVsEndDiffFilter, increasingForLastNumPointsFilter, increasingForAllPointsFilter };
+export default createFilterGroup;

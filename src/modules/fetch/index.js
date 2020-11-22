@@ -92,7 +92,8 @@ function attributeProcessor($, rowTitle) {
       return parseInt(rawNumber, 10) * negativeMultiplyer;
     });
 
-  return attributeData;
+  // reversed because the data on site starts from most recent
+  return attributeData.reverse();
 }
 
 /**

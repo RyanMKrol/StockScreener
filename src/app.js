@@ -10,30 +10,30 @@ const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
  * @param {string} index Index to run screener for
  */
 async function main(index) {
+  const results = {};
+
   const fundamentalsLinks = await fetchFundamentalsLinks(index);
 
-  const data = await async.mapLimit(
+  await async.mapLimit(
     fundamentalsLinks,
     SIMULTANEOUS_FUNDAMENTALS_FETCHES,
     async (link) => new Promise((resolve, reject) => {
+      const stockName = new URL(link).searchParams.get('shareprice');
+
       curl.get(link, (err, response, body) => {
         try {
           const $ = cheerio.load(body);
 
-          const baseLinks = $('.sp-fundamentals__table tr').filter(
-            (i, elem) => $(elem)
-              .children('td')
-              .first()
-              .text() === 'Revenue',
-          );
+          const revenueData = revenueProcessor($);
+          const preTaxProfitData = preTaxProfitProcessor($);
 
-          const revenueData = $(baseLinks)
-            .children('td')
-            .map((i, elem) => (i === 0 ? undefined : $(elem).text()))
-            .get()
-            .map((x) => parseInt(x.replace(',', ''), 10));
+          results[stockName] = {
+            link,
+            revenue: revenueData,
+            preTaxProfit: preTaxProfitData,
+          };
 
-          resolve(revenueData);
+          resolve();
         } catch (error) {
           reject(new Error('Failed to fetch the fundamentals'));
         }
@@ -41,7 +41,59 @@ async function main(index) {
     }),
   );
 
-  console.log(data);
+  console.log(results);
+}
+
+/**
+ * Processor for extracting profit before tax data
+ *
+ * @param $
+ */
+function preTaxProfitProcessor($) {
+  const baseLinks = $('.sp-fundamentals__table tr').filter(
+    (i, elem) => $(elem)
+      .children('td')
+      .first()
+      .text() === 'Pre tax Profit',
+  );
+
+  const preTaxProfitData = $(baseLinks)
+    .children('td')
+    .map((i, elem) => (i === 0 ? undefined : $(elem).text()))
+    .get()
+    .map((x) => {
+      // checks if the number is negative to modify the final result
+      const negativeMultiplyer = x.includes('(') ? -1 : 1;
+
+      // removes all string data to be able to parse number later
+      const rawNumber = x.replace(/[,|(|)]/g, '');
+
+      return parseInt(rawNumber, 10) * negativeMultiplyer;
+    });
+
+  return preTaxProfitData;
+}
+
+/**
+ * Processor for extracting revenue data
+ *
+ * @param $
+ */
+function revenueProcessor($) {
+  const baseLinks = $('.sp-fundamentals__table tr').filter(
+    (i, elem) => $(elem)
+      .children('td')
+      .first()
+      .text() === 'Revenue',
+  );
+
+  const revenueData = $(baseLinks)
+    .children('td')
+    .map((i, elem) => (i === 0 ? undefined : $(elem).text()))
+    .get()
+    .map((x) => parseInt(x.replace(',', ''), 10));
+
+  return revenueData;
 }
 
 /**

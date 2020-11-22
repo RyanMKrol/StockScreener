@@ -1,6 +1,7 @@
 import curl from 'curl';
 import cheerio from 'cheerio';
 import async from 'async';
+import * as noodleUtils from 'noodle-utils';
 
 const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
 
@@ -17,16 +18,6 @@ const INDEX_CONSTITUENTS_LINKS = {
 };
 
 /**
- * @typedef Fundamentals
- * @type {object}
- * @property {string} name - Name of the stock
- * @property {string} link - Link to the stock data
- * @property {Array.<number>} revenue - Revenue data
- * @property {Array.<number>} operatingProfit - Operating profit data
- * @property {Array.<number>} preTaxProfit - Pre-Tax Profit data
- */
-
-/**
  * @typedef CheerioParseResult
  * @see https://www.npmjs.com/package/cheerio
  */
@@ -35,7 +26,7 @@ const INDEX_CONSTITUENTS_LINKS = {
  * The ingress for fetching fundamentals data
  *
  * @param {string} index Index to fetch fundamentals for
- * @returns {Array.<Fundamentals>} The fundamentals for every stock in the index
+ * @returns {Array.<module:app.Fundamentals>} The fundamentals for every stock in the index
  */
 async function fetchRawFundamentalsData(index) {
   const fundamentalsLinks = await fetchFundamentalsLinks(index);
@@ -48,15 +39,15 @@ async function fetchRawFundamentalsData(index) {
  * Method to fetch relevant fundamentals data for given stock links
  *
  * @param {Array.<string>} links Links for the stocks we want data for
- * @returns {Array.<Fundamentals>} The fundamentals for every stock in the index
+ * @returns {Array.<module:app.Fundamentals>} The fundamentals for every stock in the index
  */
 async function fetchFundamentals(links) {
-  return async.mapLimit(
-    links,
-    SIMULTANEOUS_FUNDAMENTALS_FETCHES,
-    async (link) => new Promise((resolve, reject) => {
-      const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
+  return async.mapLimit(links, SIMULTANEOUS_FUNDAMENTALS_FETCHES, async (link) => {
+    await noodleUtils.sleep(3000);
 
+    const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
+
+    return new Promise((resolve, reject) => {
       curl.get(link, (err, response, body) => {
         try {
           const $ = cheerio.load(body);
@@ -72,8 +63,8 @@ async function fetchFundamentals(links) {
           reject(new Error('Failed to fetch the fundamentals'));
         }
       });
-    }),
-  );
+    });
+  });
 }
 
 /**

@@ -1,4 +1,17 @@
+/** @module app */
+
 import fetchRawFundamentalsData from './modules/fetch';
+import { startVsEndDiffFilter } from './modules/filters';
+
+/**
+ * @typedef Fundamentals
+ * @type {object}
+ * @property {string} name - Name of the stock
+ * @property {string} link - Link to the stock data
+ * @property {Array.<number>} revenue - Revenue data
+ * @property {Array.<number>} operatingProfit - Operating profit data
+ * @property {Array.<number>} preTaxProfit - Pre-Tax Profit data
+ */
 
 /**
  * Main
@@ -7,8 +20,8 @@ import fetchRawFundamentalsData from './modules/fetch';
  */
 async function main(index) {
   const fundamentals = await fetchRawFundamentalsData(index);
-
-  console.log(fundamentals);
+  const remainingFundamentals = startVsEndDiffFilter(fundamentals, 'revenue', 20);
+  console.log(remainingFundamentals);
 }
 
 main('ftse100');

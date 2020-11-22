@@ -3,6 +3,8 @@ import cheerio from 'cheerio';
 import async from 'async';
 import * as noodleUtils from 'noodle-utils';
 
+import INDEX_CONSTITUENTS_LINKS from '../constants';
+
 const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
 
 const SHARE_NAME_URL_PARAM = 'shareprice';
@@ -10,12 +12,6 @@ const SHARE_NAME_URL_PARAM = 'shareprice';
 const REVENUE_TITLE = 'Revenue';
 const PRE_TAX_PROFIT_TITLE = 'Pre tax Profit';
 const OPERATING_PROFIT_TITLE = 'Operating Profit / Loss';
-
-const INDEX_CONSTITUENTS_LINKS = {
-  ftse100: 'https://www.lse.co.uk/share-prices/indices/ftse-100/constituents.html',
-  ftse250: 'https://www.lse.co.uk/share-prices/indices/ftse-250/constituents.html',
-  aim100: 'https://www.lse.co.uk/share-prices/indices/ftse-aim-100/constituents.html',
-};
 
 /**
  * @typedef CheerioParseResult

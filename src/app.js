@@ -4,6 +4,12 @@ import async from 'async';
 
 const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
 
+const SHARE_NAME_URL_PARAM = 'shareprice';
+
+const REVENUE_TITLE = 'Revenue';
+const PRE_TAX_PROFIT_TITLE = 'Pre tax Profit';
+const OPERATING_PROFIT_TITLE = 'Operating Profit / Loss';
+
 /**
  * Main
  *
@@ -18,7 +24,7 @@ async function main(index) {
     fundamentalsLinks,
     SIMULTANEOUS_FUNDAMENTALS_FETCHES,
     async (link) => new Promise((resolve, reject) => {
-      const stockName = new URL(link).searchParams.get('shareprice');
+      const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
 
       curl.get(link, (err, response, body) => {
         try {
@@ -26,9 +32,9 @@ async function main(index) {
 
           results[stockName] = {
             link,
-            revenue: attributeProcessor($, 'Revenue'),
-            pretTaxProfit: attributeProcessor($, 'Pre tax Profit'),
-            operatingProfit: attributeProcessor($, 'Operating Profit / Loss'),
+            revenue: attributeProcessor($, REVENUE_TITLE),
+            pretTaxProfit: attributeProcessor($, PRE_TAX_PROFIT_TITLE),
+            operatingProfit: attributeProcessor($, OPERATING_PROFIT_TITLE),
           };
 
           resolve();

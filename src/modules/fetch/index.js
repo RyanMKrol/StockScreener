@@ -2,6 +2,7 @@ import curl from 'curl';
 import cheerio from 'cheerio';
 import async from 'async';
 import * as noodleUtils from 'noodle-utils';
+import { saveIndexData, loadIndexData } from '../storage';
 
 import { INDEX_CONSTITUENTS_LINKS, SUPPORTED_ATTRIBUTES } from '../constants';
 
@@ -25,8 +26,14 @@ const HTML_OPERATING_PROFIT = 'Operating Profit / Loss';
  * @returns {Array.<module:app.Fundamentals>} The fundamentals for every stock in the index
  */
 async function fetchRawFundamentalsData(index) {
+  const data = await loadIndexData(index);
+
+  if (data) return data;
+
   const fundamentalsLinks = await fetchFundamentalsLinks(index);
   const fundamentals = await fetchFundamentals(fundamentalsLinks);
+
+  await saveIndexData(index, JSON.stringify(fundamentals));
 
   return fundamentals;
 }

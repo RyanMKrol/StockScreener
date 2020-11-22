@@ -42,7 +42,7 @@ const SCREENING_QUESTIONS = [
      * @param {object} answers Current answers to check on
      * @returns {boolean} Whether to ask this question
      */
-    when: (answers) => answers.screeningType === 'lastIncreasingByX',
+    when: (answers) => answers.type === SUPPORTED_STRATEGIES.LAST_X_YEARS_COMPARISON,
   },
   {
     name: 'wantsMoreSreening',

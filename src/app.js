@@ -11,17 +11,41 @@ const PRE_TAX_PROFIT_TITLE = 'Pre tax Profit';
 const OPERATING_PROFIT_TITLE = 'Operating Profit / Loss';
 
 /**
+ * @typedef Fundamentals
+ * @type {object}
+ * @property {string} name - Name of the stock
+ * @property {string} link - Link to the stock data
+ * @property {Array.<number>} revenue - Revenue data
+ * @property {Array.<number>} operatingProfit - Operating profit data
+ * @property {Array.<number>} preTaxProfit - Pre-Tax Profit data
+ */
+
+/**
+ * @typedef CheerioParseResult
+ * @see https://www.npmjs.com/package/cheerio
+ */
+
+/**
  * Main
  *
  * @param {string} index Index to run screener for
  */
 async function main(index) {
-  const results = {};
-
   const fundamentalsLinks = await fetchFundamentalsLinks(index);
+  const fundamentals = await fetchFundamentals(fundamentalsLinks);
 
-  await async.mapLimit(
-    fundamentalsLinks,
+  console.log(fundamentals);
+}
+
+/**
+ * Method to fetch relevant fundamentals data for given stock links
+ *
+ * @param {Array.<string>} links Links for the stocks we want data for
+ * @returns {Array.<Fundamentals>} The fundamentals for every stock in the index
+ */
+async function fetchFundamentals(links) {
+  return async.mapLimit(
+    links,
     SIMULTANEOUS_FUNDAMENTALS_FETCHES,
     async (link) => new Promise((resolve, reject) => {
       const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
@@ -30,29 +54,27 @@ async function main(index) {
         try {
           const $ = cheerio.load(body);
 
-          results[stockName] = {
+          resolve({
+            name: stockName,
             link,
             revenue: attributeProcessor($, REVENUE_TITLE),
             pretTaxProfit: attributeProcessor($, PRE_TAX_PROFIT_TITLE),
             operatingProfit: attributeProcessor($, OPERATING_PROFIT_TITLE),
-          };
-
-          resolve();
+          });
         } catch (error) {
           reject(new Error('Failed to fetch the fundamentals'));
         }
       });
     }),
   );
-
-  console.log(results);
 }
 
 /**
  * Processor for extracting attributes from fundamentals
  *
- * @param $
- * @param rowTitle
+ * @param {CheerioParseResult} $ The result of parsing the initial page body with Cheerio
+ * @param {string} rowTitle The title corresponding to the attribute we want to fetch
+ * @returns {Array.<number>} The numbers corresponding to the attribute we want
  */
 function attributeProcessor($, rowTitle) {
   const baseLinks = $('.sp-fundamentals__table tr').filter(
@@ -62,7 +84,7 @@ function attributeProcessor($, rowTitle) {
       .text() === rowTitle,
   );
 
-  const preTaxProfitData = $(baseLinks)
+  const attributeData = $(baseLinks)
     .children('td')
     .map((i, elem) => (i === 0 ? undefined : $(elem).text()))
     .get()
@@ -76,7 +98,7 @@ function attributeProcessor($, rowTitle) {
       return parseInt(rawNumber, 10) * negativeMultiplyer;
     });
 
-  return preTaxProfitData;
+  return attributeData;
 }
 
 /**

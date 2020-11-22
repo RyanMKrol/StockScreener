@@ -24,13 +24,11 @@ async function main(index) {
         try {
           const $ = cheerio.load(body);
 
-          const revenueData = revenueProcessor($);
-          const preTaxProfitData = preTaxProfitProcessor($);
-
           results[stockName] = {
             link,
-            revenue: revenueData,
-            preTaxProfit: preTaxProfitData,
+            revenue: attributeProcessor($, 'Revenue'),
+            pretTaxProfit: attributeProcessor($, 'Pre tax Profit'),
+            operatingProfit: attributeProcessor($, 'Operating Profit / Loss'),
           };
 
           resolve();
@@ -45,16 +43,17 @@ async function main(index) {
 }
 
 /**
- * Processor for extracting profit before tax data
+ * Processor for extracting attributes from fundamentals
  *
  * @param $
+ * @param rowTitle
  */
-function preTaxProfitProcessor($) {
+function attributeProcessor($, rowTitle) {
   const baseLinks = $('.sp-fundamentals__table tr').filter(
     (i, elem) => $(elem)
       .children('td')
       .first()
-      .text() === 'Pre tax Profit',
+      .text() === rowTitle,
   );
 
   const preTaxProfitData = $(baseLinks)
@@ -72,28 +71,6 @@ function preTaxProfitProcessor($) {
     });
 
   return preTaxProfitData;
-}
-
-/**
- * Processor for extracting revenue data
- *
- * @param $
- */
-function revenueProcessor($) {
-  const baseLinks = $('.sp-fundamentals__table tr').filter(
-    (i, elem) => $(elem)
-      .children('td')
-      .first()
-      .text() === 'Revenue',
-  );
-
-  const revenueData = $(baseLinks)
-    .children('td')
-    .map((i, elem) => (i === 0 ? undefined : $(elem).text()))
-    .get()
-    .map((x) => parseInt(x.replace(',', ''), 10));
-
-  return revenueData;
 }
 
 /**

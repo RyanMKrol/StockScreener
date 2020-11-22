@@ -18,7 +18,8 @@
     "async": "^3.2.0",
     "cheerio": "^1.0.0-rc.3",
     "core-js": "^3.7.0",
-    "curl": "^0.1.4"
+    "curl": "^0.1.4",
+    "noodle-utils": "^3.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",

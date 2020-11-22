@@ -9,9 +9,9 @@ const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
 
 const SHARE_NAME_URL_PARAM = 'shareprice';
 
-const REVENUE_TITLE = 'Revenue';
-const PRE_TAX_PROFIT_TITLE = 'Pre tax Profit';
-const OPERATING_PROFIT_TITLE = 'Operating Profit / Loss';
+const HTML_REVENUE = 'Revenue';
+const HTML_PRE_TAX_PROFIT = 'Pre tax Profit';
+const HTML_OPERATING_PROFIT = 'Operating Profit / Loss';
 
 /**
  * @typedef CheerioParseResult
@@ -51,9 +51,9 @@ async function fetchFundamentals(links) {
           resolve({
             name: stockName,
             link,
-            [SUPPORTED_ATTRIBUTES.REVENUE]: attributeProcessor($, REVENUE_TITLE),
-            [SUPPORTED_ATTRIBUTES.PRE_TAX_PROFIT]: attributeProcessor($, PRE_TAX_PROFIT_TITLE),
-            [SUPPORTED_ATTRIBUTES.OPERATING_PROFIT]: attributeProcessor($, OPERATING_PROFIT_TITLE),
+            [SUPPORTED_ATTRIBUTES.REVENUE]: attributeProcessor($, HTML_REVENUE),
+            [SUPPORTED_ATTRIBUTES.PRE_TAX_PROFIT]: attributeProcessor($, HTML_PRE_TAX_PROFIT),
+            [SUPPORTED_ATTRIBUTES.OPERATING_PROFIT]: attributeProcessor($, HTML_OPERATING_PROFIT),
           });
         } catch (error) {
           reject(new Error('Failed to fetch the fundamentals'));

@@ -3,7 +3,7 @@ import cheerio from 'cheerio';
 import async from 'async';
 import * as noodleUtils from 'noodle-utils';
 
-import INDEX_CONSTITUENTS_LINKS from '../constants';
+import { INDEX_CONSTITUENTS_LINKS, SUPPORTED_ATTRIBUTES } from '../constants';
 
 const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
 
@@ -51,9 +51,9 @@ async function fetchFundamentals(links) {
           resolve({
             name: stockName,
             link,
-            revenue: attributeProcessor($, REVENUE_TITLE),
-            pretTaxProfit: attributeProcessor($, PRE_TAX_PROFIT_TITLE),
-            operatingProfit: attributeProcessor($, OPERATING_PROFIT_TITLE),
+            [SUPPORTED_ATTRIBUTES.REVENUE]: attributeProcessor($, REVENUE_TITLE),
+            [SUPPORTED_ATTRIBUTES.PRE_TAX_PROFIT]: attributeProcessor($, PRE_TAX_PROFIT_TITLE),
+            [SUPPORTED_ATTRIBUTES.OPERATING_PROFIT]: attributeProcessor($, OPERATING_PROFIT_TITLE),
           });
         } catch (error) {
           reject(new Error('Failed to fetch the fundamentals'));

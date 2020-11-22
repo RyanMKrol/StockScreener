@@ -1,7 +1,8 @@
 /** @module app */
 
 import fetchRawFundamentalsData from './modules/fetch';
-import { startVsEndDiffFilter } from './modules/filters';
+import { generateIndex, generateScreeningData } from './modules/interaction';
+import createFilterGroup from './modules/filters';
 
 /**
  * @typedef Fundamentals
@@ -15,13 +16,16 @@ import { startVsEndDiffFilter } from './modules/filters';
 
 /**
  * Main
- *
- * @param {string} index Index to run screener for
  */
-async function main(index) {
+async function main() {
+  const index = await generateIndex();
+  const screeningInfo = await generateScreeningData();
+  const filters = createFilterGroup(screeningInfo);
   const fundamentals = await fetchRawFundamentalsData(index);
-  const remainingFundamentals = startVsEndDiffFilter(fundamentals, 'revenue', 20);
-  console.log(remainingFundamentals);
+
+  const screenedStocks = filters.reduce((acc, filter) => filter(acc), fundamentals);
+
+  console.log(screenedStocks);
 }
 
-main('ftse100');
+main();

@@ -8,7 +8,7 @@
   "license": "MIT",
   "main": "build/app.js",
   "bin": {
-    "stock-screen": "node ./build/app.js"
+    "stock-screen": "./build/app.js"
   },
   "scripts": {
     "build": "npm run lint && ./node_modules/.bin/babel src --out-dir build",

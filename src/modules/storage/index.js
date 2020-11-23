@@ -4,16 +4,12 @@ import moment from 'moment';
 /**
  * Method to save data for re-use later
  *
- * @param {string} index The index we want to save data for
+ * @param {string} filename The filename to save data against
  * @param {object} data The data to store in our file
  */
-async function saveIndexData(index, data) {
-  await fs.open(fileName(index), 'wx', async (err, fd) => {
-    if (err) {
-      if (err.code === 'EEXIST') {
-        return;
-      }
-
+async function save(filename, data) {
+  await fs.open(filename, 'w', async (err, fd) => {
+    if (err && err.code !== 'EEXIST') {
       throw err;
     }
 
@@ -26,13 +22,13 @@ async function saveIndexData(index, data) {
 /**
  * Method to load data that has been saved for today
  *
- * @param {string} index The index we want to save data for
+ * @param {string} filename The filename to save data against
  * @returns {Promise.<Array.<module:app.Fundamentals>>} The fundamentals that have been saved
  */
-async function loadIndexData(index) {
+async function load(filename) {
   return new Promise((resolve) => {
     // open the file and check that it exists before reading
-    fs.open(fileName(index), 'r', (err, fd) => {
+    fs.open(filename, 'r', (err, fd) => {
       if (err) {
         resolve();
       } else {
@@ -47,15 +43,25 @@ async function loadIndexData(index) {
 }
 
 /**
- * Method to generate the filename to interact with
- *
+ * Method to generate the fundamentals filename
  *
  * @param {string} index The index to load/save data for
  * @returns {string} The filename
  */
-function fileName(index) {
+function generateFundamantalsFilename(index) {
   const date = moment().format('DD-MM-YYYY');
   return `${__dirname}/../../../data/${index}-fundamentals-${date}.json`;
 }
 
-export { saveIndexData, loadIndexData };
+/**
+ * Method to generate the report filename
+ *
+ * @returns {string} The filename
+ */
+function generateReportFilename() {
+  return `${__dirname}/../../../data/report.html`;
+}
+
+export {
+  save, load, generateFundamantalsFilename, generateReportFilename,
+};

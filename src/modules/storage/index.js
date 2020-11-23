@@ -1,3 +1,4 @@
+import * as shell from 'shelljs';
 import fs from 'fs';
 import moment from 'moment';
 
@@ -43,6 +44,15 @@ async function load(filename) {
 }
 
 /**
+ * Open a file
+ *
+ * @param {string} filename The location of the file to open
+ */
+function openFile(filename) {
+  shell.exec(`open ${filename}`);
+}
+
+/**
  * Method to generate the fundamentals filename
  *
  * @param {string} index The index to load/save data for
@@ -63,5 +73,5 @@ function generateReportFilename() {
 }
 
 export {
-  save, load, generateFundamantalsFilename, generateReportFilename,
+  save, load, generateFundamantalsFilename, generateReportFilename, openFile,
 };

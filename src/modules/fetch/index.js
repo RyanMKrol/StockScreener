@@ -6,7 +6,8 @@ import { saveIndexData, loadIndexData } from '../storage';
 
 import { INDEX_CONSTITUENTS_LINKS, SUPPORTED_ATTRIBUTES } from '../constants';
 
-const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 5;
+const WAIT_BETWEEN_FETCHES = 5000;
+const SIMULTANEOUS_FUNDAMENTALS_FETCHES = 2;
 
 const SHARE_NAME_URL_PARAM = 'shareprice';
 
@@ -46,7 +47,7 @@ async function fetchRawFundamentalsData(index) {
  */
 async function fetchFundamentals(links) {
   return async.mapLimit(links, SIMULTANEOUS_FUNDAMENTALS_FETCHES, async (link) => {
-    await noodleUtils.sleep(3000);
+    await noodleUtils.sleep(WAIT_BETWEEN_FETCHES);
 
     const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
 

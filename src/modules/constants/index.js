@@ -13,6 +13,7 @@ const SUPPORTED_ATTRIBUTES = {
 const SUPPORTED_STRATEGIES = {
   FIRST_LAST_COMPARISON: 'First Year vs Last Year',
   LAST_X_YEARS_COMPARISON: 'Increasing for Last X Years',
+  FIRST_X_YEARS_COMPARISON: 'Increasing for First X Years',
   ALL_YEARS_COMPARISON: 'Increasing Every Year',
 };
 

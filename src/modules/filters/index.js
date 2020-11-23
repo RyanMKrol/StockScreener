@@ -5,6 +5,7 @@
 
 import {
   startVsEndDiffFilter,
+  increasingForFirstNumPointsFilter,
   increasingForLastNumPointsFilter,
   increasingForAllPointsFilter,
 } from './Filters';
@@ -31,6 +32,13 @@ function createFilter(answer) {
   switch (answer.type) {
     case SUPPORTED_STRATEGIES.FIRST_LAST_COMPARISON:
       return (fundamentals) => startVsEndDiffFilter(fundamentals, answer.attribute, answer.threshold);
+    case SUPPORTED_STRATEGIES.FIRST_X_YEARS_COMPARISON:
+      return (fundamentals) => increasingForFirstNumPointsFilter(
+        fundamentals,
+        answer.attribute,
+        answer.threshold,
+        answer.years,
+      );
     case SUPPORTED_STRATEGIES.LAST_X_YEARS_COMPARISON:
       return (fundamentals) => increasingForLastNumPointsFilter(
         fundamentals,

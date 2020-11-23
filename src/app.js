@@ -1,8 +1,10 @@
 /** @module app */
 
+import * as utils from 'noodle-utils';
 import fetchRawFundamentalsData from './modules/fetch';
 import { generateIndex, generateScreeningData } from './modules/interaction';
 import createFilterGroup from './modules/filters';
+import generateReport from './modules/report';
 
 /**
  * @typedef Fundamentals
@@ -20,12 +22,21 @@ import createFilterGroup from './modules/filters';
 async function main() {
   const index = await generateIndex();
   const screeningInfo = await generateScreeningData();
+
+  utils.startStatusIndicator('Gathering Fundamentals Data');
+
   const filters = createFilterGroup(screeningInfo);
   const fundamentals = await fetchRawFundamentalsData(index);
 
   const screenedStocks = filters.reduce((acc, filter) => filter(acc), fundamentals);
 
-  console.log(screenedStocks);
+  utils.stopStatusIndicator();
+
+  utils.startStatusIndicator('Generating Screen Report');
+  generateReport(screenedStocks);
+  utils.stopStatusIndicator();
+
+  process.stdout.write('Finished!\n');
 }
 
 main();

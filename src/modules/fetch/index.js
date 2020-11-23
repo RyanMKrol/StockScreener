@@ -2,7 +2,7 @@ import curl from 'curl';
 import cheerio from 'cheerio';
 import async from 'async';
 import * as noodleUtils from 'noodle-utils';
-import { saveIndexData, loadIndexData } from '../storage';
+import { save, load, generateFundamantalsFilename } from '../storage';
 
 import { INDEX_CONSTITUENTS_LINKS, SUPPORTED_ATTRIBUTES } from '../constants';
 
@@ -27,14 +27,15 @@ const HTML_OPERATING_PROFIT = 'Operating Profit / Loss';
  * @returns {Array.<module:app.Fundamentals>} The fundamentals for every stock in the index
  */
 async function fetchRawFundamentalsData(index) {
-  const data = await loadIndexData(index);
+  const cacheFilename = generateFundamantalsFilename(index);
+  const data = await load(cacheFilename);
 
   if (data) return data;
 
   const fundamentalsLinks = await fetchFundamentalsLinks(index);
   const fundamentals = await fetchFundamentals(fundamentalsLinks);
 
-  await saveIndexData(index, JSON.stringify(fundamentals));
+  await save(cacheFilename, JSON.stringify(fundamentals));
 
   return fundamentals;
 }
@@ -49,7 +50,7 @@ async function fetchFundamentals(links) {
   return async.mapLimit(links, SIMULTANEOUS_FUNDAMENTALS_FETCHES, async (link) => {
     await noodleUtils.sleep(WAIT_BETWEEN_FETCHES);
 
-    const stockName = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
+    const ticker = new URL(link).searchParams.get(SHARE_NAME_URL_PARAM);
 
     return new Promise((resolve, reject) => {
       curl.get(link, (err, response, body) => {
@@ -57,8 +58,9 @@ async function fetchFundamentals(links) {
           const $ = cheerio.load(body);
 
           resolve({
-            name: stockName,
-            link,
+            ticker,
+            dataSourceLink: link,
+            followUpLink: `https://www.google.com/search?tbm=fin&q=LON:${ticker}`,
             [SUPPORTED_ATTRIBUTES.REVENUE]: attributeProcessor($, HTML_REVENUE),
             [SUPPORTED_ATTRIBUTES.PRE_TAX_PROFIT]: attributeProcessor($, HTML_PRE_TAX_PROFIT),
             [SUPPORTED_ATTRIBUTES.OPERATING_PROFIT]: attributeProcessor($, HTML_OPERATING_PROFIT),

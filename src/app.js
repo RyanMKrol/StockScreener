@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /** @module app */
 
 import * as utils from 'noodle-utils';

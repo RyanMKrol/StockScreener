@@ -28,7 +28,8 @@
     "curl": "^0.1.4",
     "inquirer": "^7.3.3",
     "moment": "^2.29.1",
-    "noodle-utils": "^3.3.1"
+    "noodle-utils": "^3.3.1",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",

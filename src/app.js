@@ -7,6 +7,7 @@ import fetchRawFundamentalsData from './modules/fetch';
 import { generateIndex, generateScreeningData } from './modules/interaction';
 import createFilterGroup from './modules/filters';
 import generateReport from './modules/report';
+import { openFile, generateReportFilename } from './modules/storage';
 
 /**
  * @typedef Fundamentals
@@ -39,6 +40,8 @@ async function main() {
   utils.stopStatusIndicator();
 
   process.stdout.write('Finished!\n');
+
+  openFile(generateReportFilename());
 }
 
 main();

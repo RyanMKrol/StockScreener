@@ -26,5 +26,3 @@ credentials/*
 !credentials/*.enc
 
 config.json
-
-data

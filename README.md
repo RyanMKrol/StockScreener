@@ -9,4 +9,4 @@ This tool lets me screen stocks in given indexes according to their fundamentals
 
 ## Example
 
-![Demo of StockScreener](https://media.giphy.com/media/CYyV97DOeMh1s3nhiH/giphy.gif 'Demo of StockScreener')
+![Demo of StockScreener](demo/StockScreenDemoFinal.gif 'Demo of StockScreener')

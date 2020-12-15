@@ -1,6 +1,5 @@
 import * as shell from 'shelljs';
 import fs from 'fs';
-import moment from 'moment';
 
 /**
  * Method to save data for re-use later
@@ -53,17 +52,6 @@ function openFile(filename) {
 }
 
 /**
- * Method to generate the fundamentals filename
- *
- * @param {string} index The index to load/save data for
- * @returns {string} The filename
- */
-function generateFundamantalsFilename(index) {
-  const date = moment().format('DD-MM-YYYY');
-  return `${__dirname}/../../../data/${index}-fundamentals-${date}.json`;
-}
-
-/**
  * Method to generate the report filename
  *
  * @returns {string} The filename
@@ -73,5 +61,5 @@ function generateReportFilename() {
 }
 
 export {
-  save, load, generateFundamantalsFilename, generateReportFilename, openFile,
+  save, load, generateReportFilename, openFile,
 };

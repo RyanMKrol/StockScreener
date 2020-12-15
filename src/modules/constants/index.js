@@ -1,8 +1,4 @@
-const INDEX_CONSTITUENTS_LINKS = {
-  FTSE_100: 'https://www.lse.co.uk/share-prices/indices/ftse-100/constituents.html',
-  FTSE_250: 'https://www.lse.co.uk/share-prices/indices/ftse-250/constituents.html',
-  AIM_100: 'https://www.lse.co.uk/share-prices/indices/ftse-aim-100/constituents.html',
-};
+const SUPPORTED_INDEXES = ['FTSE_100', 'FTSE_250', 'FTSE_350', 'FTSE_ALL_SHARE'];
 
 const SUPPORTED_ATTRIBUTES = {
   REVENUE: 'Revenue',
@@ -17,4 +13,4 @@ const SUPPORTED_STRATEGIES = {
   ALL_YEARS_COMPARISON: 'Increasing Every Year',
 };
 
-export { INDEX_CONSTITUENTS_LINKS, SUPPORTED_ATTRIBUTES, SUPPORTED_STRATEGIES };
+export { SUPPORTED_INDEXES, SUPPORTED_ATTRIBUTES, SUPPORTED_STRATEGIES };

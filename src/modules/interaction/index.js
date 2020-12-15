@@ -1,13 +1,13 @@
 import inquirer from 'inquirer';
 
-import { INDEX_CONSTITUENTS_LINKS, SUPPORTED_STRATEGIES, SUPPORTED_ATTRIBUTES } from '../constants';
+import { SUPPORTED_INDEXES, SUPPORTED_STRATEGIES, SUPPORTED_ATTRIBUTES } from '../constants';
 
 const INDEX_QUESTIONS = [
   {
     name: 'index',
     type: 'list',
     message: 'What index would you like to screen?',
-    choices: Object.keys(INDEX_CONSTITUENTS_LINKS),
+    choices: SUPPORTED_INDEXES,
   },
 ];
 

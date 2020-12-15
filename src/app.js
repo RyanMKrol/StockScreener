@@ -36,7 +36,9 @@ async function main() {
   utils.stopStatusIndicator();
 
   utils.startStatusIndicator('Generating Screen Report');
-  generateReport(screenedStocks);
+
+  await generateReport(screenedStocks);
+
   utils.stopStatusIndicator();
 
   process.stdout.write('Finished!\n');
